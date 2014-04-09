@@ -1,0 +1,10 @@
+<mountains>
+    <mountain>
+        <name>Mount Everest</name>
+        <height>29029</height>
+    </mountain>
+    <mountain>
+        <name>K2</name>
+        <height>28251</height>
+    </mountain>
+</mountains>

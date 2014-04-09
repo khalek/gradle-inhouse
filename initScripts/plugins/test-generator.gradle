@@ -1,0 +1,55 @@
+import groovy.text.SimpleTemplateEngine
+import groovy.text.Template
+import groovy.text.TemplateEngine
+
+apply plugin: 'groovy'
+
+version = '1.0'
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:1.8.1@jar'
+    testCompile group: 'junit', name: 'junit', version: '4.7', files('libs/spock-core-0.6-groovy-1.8.jar')
+}
+
+clean {
+    delete 'src/test'
+}
+
+task createTests(type: CreateTests) {
+    template = file("src/templates/test.groovy")
+    packages = 11
+    tests = 20
+}
+
+class CreateTests extends DefaultTask {
+    @InputFile
+    File template
+
+    @Input
+    int packages
+
+    @Input
+    int tests
+
+    @OutputDirectory
+    File out = new File("src/test/groovy")
+
+    @TaskAction
+    def create() {
+        project.delete out
+        def engine = new SimpleTemplateEngine()
+        packages.times { packageCounter ->
+            String packageName = "org.gradle.tests$packageCounter"
+            def path = project.mkdir("" + out + "/" + packageName.replace(".", "/"))
+            tests.times { testCounter ->
+                def testName = "Test$testCounter"
+                def binding = [
+                        packageName: packageName,
+                        testName: testName,
+                        sleep: 5
+                ]
+                project.file("$path/${testName}.groovy").text = engine.createTemplate(template).make(binding).toString()
+            }
+        }
+    }
+}

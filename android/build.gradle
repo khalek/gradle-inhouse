@@ -1,0 +1,48 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle:0.9.0'
+	}
+}
+
+apply plugin: 'android'
+
+android {
+	compileSdkVersion 18
+	buildToolsVersion "19.0"
+}
+
+configurations {
+	unitTestCompile.extendsFrom runtime
+	unitTestRuntime.extendsFrom unitTestCompile
+}
+
+dependencies {
+	compile 'com.android.support:support-v4:18.0.+'
+	unitTestCompile(
+		files("$project.buildDir/classes/debug"),
+		'junit:junit:4.11'
+	)
+	androidTestCompile 'com.jayway.android.robotium:robotium-solo:4.3.1'
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	unitTest {
+		java.srcDir 'src/unitTest/java'
+	}
+}
+
+task unitTest(type: Test, dependsOn: assemble) {
+	description = "Runs the unit tests for this project"
+	testClassesDir = project.sourceSets.unitTest.output.classesDir
+	classpath = project.sourceSets.unitTest.runtimeClasspath
+}
+build.dependsOn unitTest
+
+task wrapper(type: Wrapper)

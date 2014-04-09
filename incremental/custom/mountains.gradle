@@ -1,0 +1,8 @@
+task generateMountainFile << {
+    def outputDir = mkdir("$buildDir/mountains")
+    def mountains = new XmlSlurper().parse(file("src/mountains.xml"))
+    mountains.mountain.each { mountain ->
+        def mountainFile = new File(outputDir, mountain.name.text() + ".txt")
+        mountainFile.text = "feet:${mountain.height.text()}"
+    }
+}
